@@ -2,6 +2,19 @@
 
 Deep Learning for Music Genre Classification and Tagging using PyTorch
 
+## Main goals:
+
+Research literature about sound and music pre-processing, transformation, and representation. What type of pre-processing is best for music pieces, i.e. what is the state-of-the-art of spectrograms vs. raw waveform? <br>
+Train an encoding model (deep recurrent and/or CNN network) with appropriate representation to classify sequences of music pieces. Your options are vast as you can consider all the tools that we covered in class: GRUs? CNNs? Variational Encoders? Combinations thereof? Make use of recent examples from literature! Can you identify an architecture (and meta-parameter settings) that can be trained to tag/classify considerably well? <br>
+Study the performance for edge cases, such as particularly short input sequences or music pieces for rare genres/categories. Can you identify characteristics of such edge cases that make performance particularly high or low? <br>
+
+### Optional:
+
+Identify differences in quantitative performance and qualitative characteristics (look into how your model decides in edge cases) between different pre-processing options. <br>
+Build your music tagger by training only on one of the datasets and comparing generalisation on the other. Given that you took good care of appropriate representation and pre-processing for both, can you explain the performance differences? <br>
+Look into pre-trained options (e.g. from paperswithcode.com) and fine-tune your extended models. How is performance (quantitative and qualitative) different?
+
+
 ## Overview
 
 This project implements deep learning models (CNN and RNN/LSTM) for automatic music genre classification and tagging. The models can process arbitrary-length audio sequences and classify them into genres or assign multiple tags.
@@ -14,12 +27,12 @@ This project implements deep learning models (CNN and RNN/LSTM) for automatic mu
 
 ## Features
 
-- 🎵 Multiple model architectures: CNN, LSTM, GRU, and hybrid CNN-LSTM
-- 📊 Support for both single-label (genre) and multi-label (tags) classification
-- 🔧 Easy-to-use PyTorch implementations in Jupyter notebooks
-- 📈 Training with early stopping and learning rate scheduling
-- 🎯 Inference utilities for new audio files
-- 📉 Comprehensive evaluation metrics and visualizations
+- Multiple model architectures: CNN, LSTM, GRU, and hybrid CNN-LSTM
+- Support for both single-label (genre) and multi-label (tags) classification
+- Easy-to-use PyTorch implementations in Jupyter notebooks
+- Training with early stopping and learning rate scheduling
+- Inference utilities for new audio files
+- Comprehensive evaluation metrics and visualizations
 
 ## Project Structure
 
@@ -55,12 +68,18 @@ git clone https://github.com/DeLyXHardiee/Tagging-Music-Sequences.git
 cd Tagging-Music-Sequences
 ```
 
-2. Install dependencies:
+2. Create a virutal environment (optional):
+```bash
+python -m venv venv
+venv/Scripts/Activate
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Download datasets (see Dataset Setup section)
+4. Download datasets (see Dataset Setup section)
 
 ## Dataset Setup
 
@@ -174,56 +193,3 @@ Model performance will vary based on:
 - Model architecture and hyperparameters
 - Training duration and regularization
 - Audio preprocessing choices
-
-Typical GTZAN accuracy: 70-90% depending on model complexity.
-
-## Advanced Usage
-
-### Custom Datasets
-
-Create your own dataset class following the pattern in the data loading notebooks:
-
-```python
-class CustomDataset(Dataset):
-    def __init__(self, audio_dir, sample_rate=22050):
-        # Your implementation
-        pass
-    
-    def __getitem__(self, idx):
-        # Return (waveform, label)
-        pass
-```
-
-### Model Customization
-
-Modify model architectures in the model notebooks to experiment with:
-- Different numbers of layers
-- Alternative activation functions
-- Various pooling strategies
-- Attention mechanisms
-
-## Citation
-
-If you use this code in your research, please cite the relevant datasets:
-
-- GTZAN: Tzanetakis, G., & Cook, P. (2002). Musical genre classification of audio signals.
-- MTAT: Law, E., et al. (2009). Evaluation of algorithms using games: The case of music tagging.
-- FMA: Defferrard, M., et al. (2017). FMA: A dataset for music analysis.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Acknowledgments
-
-- PyTorch team for the excellent deep learning framework
-- Librosa and torchaudio for audio processing utilities
-- Dataset creators for making their data publicly available
-
-## Contact
-
-For questions or issues, please open an issue on GitHub.
