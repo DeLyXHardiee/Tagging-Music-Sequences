@@ -53,10 +53,6 @@ data/fma_metadata/
 *.flac
 *.ogg
 
-# Model checkpoints
-models/*.pth
-models/*.pt
-models/*.h5
 
 # Logs
 logs/
