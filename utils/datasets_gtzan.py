@@ -2,8 +2,10 @@ import os
 from typing import Tuple, Optional
 
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 import torchaudio
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 # Public genres list for reference
 GENRES = [
@@ -186,9 +188,28 @@ def create_dataloaders(
     if persistent_workers is None:
         persistent_workers = bool(num_workers > 0)
 
-    train_size = int(train_split * len(dataset))
-    val_size = len(dataset) - train_size
-    train_subset, val_subset = torch.utils.data.random_split(dataset, [train_size, val_size])
+    # Use stratified split to ensure balanced validation set
+    try:
+        # Extract labels for stratification
+        labels = dataset.labels
+        indices = np.arange(len(dataset))
+        
+        train_indices, val_indices = train_test_split(
+            indices, 
+            train_size=train_split, 
+            stratify=labels, 
+            random_state=42
+        )
+        
+        train_subset = Subset(dataset, train_indices)
+        val_subset = Subset(dataset, val_indices)
+        print(f"Created stratified split: {len(train_subset)} train, {len(val_subset)} val")
+        
+    except Exception as e:
+        print(f"Stratified split failed (dataset might not have .labels), falling back to random split: {e}")
+        train_size = int(train_split * len(dataset))
+        val_size = len(dataset) - train_size
+        train_subset, val_subset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
     # Apply augmentation if provided
     if train_transform:
