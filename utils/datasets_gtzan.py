@@ -132,6 +132,67 @@ class TransformDataset(Dataset):
         return len(self.subset)
 
 
+class ChunkedDataset(Dataset):
+    """Splits long audio files into smaller chunks."""
+    def __init__(self, dataset, chunk_length_sec=3.0, overlap=0.5, transform=None):
+        self.dataset = dataset
+        self.chunk_length_sec = chunk_length_sec
+        self.overlap = overlap
+        self.transform = transform
+        
+        # Try to get properties from underlying dataset
+        if hasattr(dataset, 'dataset'): # It's a Subset
+             base_ds = dataset.dataset
+        else:
+             base_ds = dataset
+             
+        self.total_duration = getattr(base_ds, 'duration', 30)
+        self.sample_rate = getattr(base_ds, 'sample_rate', 22050)
+        
+        self.samples_per_chunk = int(self.chunk_length_sec * self.sample_rate)
+        self.samples_total = int(self.total_duration * self.sample_rate)
+        
+        # Calculate stride
+        self.stride = int(self.samples_per_chunk * (1 - self.overlap))
+        
+        # Calculate number of chunks per song
+        if self.samples_total < self.samples_per_chunk:
+            self.num_chunks = 1
+        else:
+            self.num_chunks = (self.samples_total - self.samples_per_chunk) // self.stride + 1
+        
+    def __len__(self):
+        return len(self.dataset) * self.num_chunks
+
+    def __getitem__(self, idx):
+        song_idx = idx // self.num_chunks
+        chunk_idx = idx % self.num_chunks
+        
+        waveform, label = self.dataset[song_idx]
+        
+        # Extract chunk
+        start = chunk_idx * self.stride
+        end = start + self.samples_per_chunk
+        
+        # Handle case where waveform is shorter than expected
+        if waveform.shape[1] < self.samples_total:
+             # Pad original waveform if it's too short for the logic
+             padding = self.samples_total - waveform.shape[1]
+             waveform = torch.nn.functional.pad(waveform, (0, padding))
+
+        chunk = waveform[:, start:end]
+        
+        # Pad if chunk is shorter than target (e.g. last chunk or short file)
+        if chunk.shape[1] < self.samples_per_chunk:
+            padding = self.samples_per_chunk - chunk.shape[1]
+            chunk = torch.nn.functional.pad(chunk, (0, padding))
+            
+        if self.transform:
+            chunk = self.transform(chunk)
+            
+        return chunk, label
+
+
 class AudioAugmentation:
     """Simple audio augmentation pipeline."""
     def __init__(self, noise_level=0.005, shift_max=0.2):
@@ -162,6 +223,7 @@ def create_dataloaders(
     pin_memory: Optional[bool] = None,
     persistent_workers: Optional[bool] = None,
     train_transform: Optional[object] = None,
+    chunk_length_sec: Optional[float] = None,
 ) -> Tuple[DataLoader, DataLoader]:
     """Create train/val DataLoaders with Windows-safe defaults.
 
@@ -173,6 +235,7 @@ def create_dataloaders(
         pin_memory: Whether to pin memory for GPU
         persistent_workers: Keep workers alive
         train_transform: Optional transform to apply ONLY to training set
+        chunk_length_sec: If set, splits audio into chunks of this duration (seconds)
     
     Notes:
     - On Windows (spawn), using workers > 0 with classes defined in notebooks can crash.
@@ -203,7 +266,7 @@ def create_dataloaders(
         
         train_subset = Subset(dataset, train_indices)
         val_subset = Subset(dataset, val_indices)
-        print(f"Created stratified split: {len(train_subset)} train, {len(val_subset)} val")
+        print(f"Created stratified split: {len(train_subset)} train songs, {len(val_subset)} val songs")
         
     except Exception as e:
         print(f"Stratified split failed (dataset might not have .labels), falling back to random split: {e}")
@@ -211,13 +274,22 @@ def create_dataloaders(
         val_size = len(dataset) - train_size
         train_subset, val_subset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
-    # Apply augmentation if provided
-    if train_transform:
-        train_dataset = TransformDataset(train_subset, train_transform)
+    # Apply chunking if requested
+    if chunk_length_sec is not None:
+        print(f"Applying chunking: {chunk_length_sec}s chunks with 50% overlap")
+        # Wrap subsets in ChunkedDataset
+        # Note: We apply train_transform inside ChunkedDataset for training
+        train_dataset = ChunkedDataset(train_subset, chunk_length_sec=chunk_length_sec, overlap=0.5, transform=train_transform)
+        # For validation, we also chunk but without augmentation
+        val_dataset = ChunkedDataset(val_subset, chunk_length_sec=chunk_length_sec, overlap=0.5, transform=None)
+        print(f"Chunked dataset sizes: {len(train_dataset)} train chunks, {len(val_dataset)} val chunks")
     else:
-        train_dataset = train_subset
-    
-    val_dataset = val_subset
+        # Apply augmentation if provided (standard way)
+        if train_transform:
+            train_dataset = TransformDataset(train_subset, train_transform)
+        else:
+            train_dataset = train_subset
+        val_dataset = val_subset
 
     train_loader = DataLoader(
         train_dataset,

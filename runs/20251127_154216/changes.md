@@ -18,3 +18,5 @@
 - Final Val Loss: 1.4449
 - Final Train Acc: 97.75%
 - Final Val Acc: 70.00%
+
+Overfitting much larger.
