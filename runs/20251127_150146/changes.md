@@ -21,3 +21,5 @@
 - Final Val Loss: 1.2050
 - Final Train Acc: 73.97%
 - Final Val Acc: 61.00%
+
+Much more stable training.
