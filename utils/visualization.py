@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_waveform(waveform, sample_rate=22050, title="Waveform"):
+def plot_waveform(waveform, sample_rate=22050, title="Waveform", save_path=None):
     """Plot audio waveform."""
     plt.figure(figsize=(12, 4))
     plt.plot(waveform[0].numpy())
@@ -13,10 +13,15 @@ def plot_waveform(waveform, sample_rate=22050, title="Waveform"):
     plt.ylabel('Amplitude')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
 
 
-def plot_spectrogram(spectrogram, title="Spectrogram"):
+def plot_spectrogram(spectrogram, title="Spectrogram", save_path=None):
     """Plot spectrogram."""
     plt.figure(figsize=(12, 6))
     plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='viridis')
@@ -25,10 +30,15 @@ def plot_spectrogram(spectrogram, title="Spectrogram"):
     plt.ylabel('Frequency')
     plt.colorbar(label='Amplitude (dB)')
     plt.tight_layout()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
 
 
-def plot_predictions(probabilities, class_names, top_k=None):
+def plot_predictions(probabilities, class_names, top_k=None, save_path=None):
     """
     Plot prediction probabilities as horizontal bar chart.
     
@@ -36,6 +46,7 @@ def plot_predictions(probabilities, class_names, top_k=None):
         probabilities: Array of probabilities
         class_names: List of class names
         top_k: Show only top k predictions (None for all)
+        save_path: Path to save the plot
     """
     if top_k is not None:
         indices = np.argsort(probabilities)[-top_k:][::-1]
@@ -61,16 +72,22 @@ def plot_predictions(probabilities, class_names, top_k=None):
         plt.text(prob + 0.01, i, f'{prob:.3f}', va='center')
     
     plt.tight_layout()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
 
 
-def plot_training_history(history, metrics=['loss', 'accuracy']):
+def plot_training_history(history, metrics=['loss', 'accuracy'], save_path=None):
     """
     Plot training history.
     
     Args:
         history: Dictionary with training history
         metrics: List of metrics to plot
+        save_path: Path to save the plot
     """
     n_metrics = len(metrics)
     fig, axes = plt.subplots(1, n_metrics, figsize=(6*n_metrics, 4))
@@ -94,4 +111,9 @@ def plot_training_history(history, metrics=['loss', 'accuracy']):
         ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
