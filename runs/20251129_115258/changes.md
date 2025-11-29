@@ -12,7 +12,8 @@
 - Data Split: Stratified (Balanced Validation Set)
 
 ## Changes
-- Added more dropout layers to the ImprovedCNN model to reduce overfitting and removed layer 4 in the model.
+- Added mixup augmentation which will mix inputs and labelsduring training forcing the model to learn more robust features and reducing overfitting.
+- Added song-level voting which aggregates the predictions of all chunks belonging to a single song (using soft voting/averaging logits) to produce a final song-level prediction (expected to have a higher accuracy).
 
 ## Results
 - Final Train Loss: 1.2174
@@ -24,3 +25,5 @@
 - Test Recall: 0.7603
 - Test F1-Score: 0.7583
 - Song-Level Accuracy: 80.50%
+
+The mixup helped a lot with overfitting. The training and validation follows each other much closer. The validation accuracy is at an all time high and the new song-level accuracy is even higher.
