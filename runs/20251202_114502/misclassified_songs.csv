@@ -1,0 +1,19 @@
+Filename,True Genre,Predicted Genre,Confidence,Full Path
+reggae.00022.wav,reggae,hiphop,0.7252616286277771,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\reggae\reggae.00022.wav
+disco.00021.wav,disco,pop,0.6620053648948669,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\disco\disco.00021.wav
+pop.00062.wav,pop,hiphop,0.6490646004676819,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\pop\pop.00062.wav
+classical.00032.wav,classical,reggae,0.5982947945594788,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\classical\classical.00032.wav
+rock.00051.wav,rock,pop,0.584854006767273,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00051.wav
+disco.00020.wav,disco,country,0.5260937213897705,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\disco\disco.00020.wav
+disco.00085.wav,disco,hiphop,0.4927729666233063,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\disco\disco.00085.wav
+pop.00010.wav,pop,country,0.47437044978141785,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\pop\pop.00010.wav
+rock.00063.wav,rock,jazz,0.4444730579853058,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00063.wav
+metal.00060.wav,metal,rock,0.4296852946281433,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\metal\metal.00060.wav
+reggae.00094.wav,reggae,rock,0.39597079157829285,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\reggae\reggae.00094.wav
+rock.00069.wav,rock,reggae,0.36521756649017334,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00069.wav
+blues.00082.wav,blues,country,0.3568384051322937,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\blues\blues.00082.wav
+pop.00064.wav,pop,disco,0.3499377369880676,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\pop\pop.00064.wav
+reggae.00079.wav,reggae,hiphop,0.3409707546234131,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\reggae\reggae.00079.wav
+rock.00058.wav,rock,classical,0.3360219895839691,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00058.wav
+rock.00055.wav,rock,hiphop,0.27762311697006226,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00055.wav
+rock.00052.wav,rock,pop,0.2350931614637375,c:\Users\mar20\Desktop\Natural Language Processing\Tagging-Music-Sequences\data\gtzan\rock\rock.00052.wav
