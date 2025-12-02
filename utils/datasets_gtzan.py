@@ -219,18 +219,20 @@ def create_dataloaders(
     dataset: Dataset,
     batch_size: int = 16,
     train_split: float = 0.8,
+    test_split: float = 0.0,
     num_workers: Optional[int] = None,
     pin_memory: Optional[bool] = None,
     persistent_workers: Optional[bool] = None,
     train_transform: Optional[object] = None,
     chunk_length_sec: Optional[float] = None,
-) -> Tuple[DataLoader, DataLoader]:
-    """Create train/val DataLoaders with Windows-safe defaults.
+) -> Tuple[DataLoader, DataLoader, Optional[DataLoader]]:
+    """Create train/val/test DataLoaders with Windows-safe defaults.
 
     Args:
         dataset: The base dataset
         batch_size: Batch size
-        train_split: Fraction of data to use for training
+        train_split: Fraction of non-test data to use for training
+        test_split: Fraction of total data to use for testing
         num_workers: Number of worker threads
         pin_memory: Whether to pin memory for GPU
         persistent_workers: Keep workers alive
@@ -257,22 +259,53 @@ def create_dataloaders(
         labels = dataset.labels
         indices = np.arange(len(dataset))
         
-        train_indices, val_indices = train_test_split(
-            indices, 
-            train_size=train_split, 
-            stratify=labels, 
-            random_state=42
-        )
+        if test_split > 0:
+            # First split: Train+Val vs Test
+            train_val_indices, test_indices = train_test_split(
+                indices,
+                test_size=test_split,
+                stratify=labels,
+                random_state=42
+            )
+            
+            # Get labels for the train_val set to stratify the next split
+            train_val_labels = [labels[i] for i in train_val_indices]
+            
+            # Second split: Train vs Val (from Train+Val)
+            train_indices, val_indices = train_test_split(
+                train_val_indices,
+                train_size=train_split,
+                stratify=train_val_labels,
+                random_state=42
+            )
+        else:
+            test_indices = []
+            train_indices, val_indices = train_test_split(
+                indices, 
+                train_size=train_split, 
+                stratify=labels, 
+                random_state=42
+            )
         
         train_subset = Subset(dataset, train_indices)
         val_subset = Subset(dataset, val_indices)
-        print(f"Created stratified split: {len(train_subset)} train songs, {len(val_subset)} val songs")
+        test_subset = Subset(dataset, test_indices) if len(test_indices) > 0 else None
+        
+        print(f"Created stratified split: {len(train_subset)} train, {len(val_subset)} val, {len(test_subset) if test_subset else 0} test songs")
         
     except Exception as e:
         print(f"Stratified split failed (dataset might not have .labels), falling back to random split: {e}")
-        train_size = int(train_split * len(dataset))
-        val_size = len(dataset) - train_size
-        train_subset, val_subset = torch.utils.data.random_split(dataset, [train_size, val_size])
+        if test_split > 0:
+            test_size = int(test_split * len(dataset))
+            remaining_size = len(dataset) - test_size
+            train_size = int(train_split * remaining_size)
+            val_size = remaining_size - train_size
+            train_subset, val_subset, test_subset = torch.utils.data.random_split(dataset, [train_size, val_size, test_size])
+        else:
+            train_size = int(train_split * len(dataset))
+            val_size = len(dataset) - train_size
+            train_subset, val_subset = torch.utils.data.random_split(dataset, [train_size, val_size])
+            test_subset = None
 
     # Apply chunking if requested
     if chunk_length_sec is not None:
@@ -280,9 +313,11 @@ def create_dataloaders(
         # Wrap subsets in ChunkedDataset
         # Note: We apply train_transform inside ChunkedDataset for training
         train_dataset = ChunkedDataset(train_subset, chunk_length_sec=chunk_length_sec, overlap=0.5, transform=train_transform)
-        # For validation, we also chunk but without augmentation
+        # For validation and test, we also chunk but without augmentation
         val_dataset = ChunkedDataset(val_subset, chunk_length_sec=chunk_length_sec, overlap=0.5, transform=None)
-        print(f"Chunked dataset sizes: {len(train_dataset)} train chunks, {len(val_dataset)} val chunks")
+        if test_subset:
+            test_dataset = ChunkedDataset(test_subset, chunk_length_sec=chunk_length_sec, overlap=0.5, transform=None)
+        print(f"Chunked dataset sizes: {len(train_dataset)} train, {len(val_dataset)} val, {len(test_dataset) if test_subset else 0} test chunks")
     else:
         # Apply augmentation if provided (standard way)
         if train_transform:
@@ -290,6 +325,8 @@ def create_dataloaders(
         else:
             train_dataset = train_subset
         val_dataset = val_subset
+        if test_subset:
+            test_dataset = test_subset
 
     train_loader = DataLoader(
         train_dataset,
@@ -308,5 +345,16 @@ def create_dataloaders(
         pin_memory=pin_memory,
         persistent_workers=persistent_workers,
     )
+    
+    if test_subset:
+        test_loader = DataLoader(
+            test_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            persistent_workers=persistent_workers,
+        )
+        return train_loader, val_loader, test_loader
 
     return train_loader, val_loader
