@@ -56,7 +56,8 @@ class GTZANDataset(Dataset):
             genre_path = os.path.join(root_dir, genre)
             if not os.path.isdir(genre_path):
                 continue
-            for filename in os.listdir(genre_path):
+            # Sort files to ensure deterministic split
+            for filename in sorted(os.listdir(genre_path)):
                 if filename.lower().endswith(".wav"):
                     self.files.append(os.path.join(genre_path, filename))
                     self.labels.append(self.genre_to_idx[genre])
