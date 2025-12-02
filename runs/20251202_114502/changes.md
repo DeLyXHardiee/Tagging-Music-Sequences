@@ -28,10 +28,10 @@
 - Validation Song-Level Accuracy: 85.56%
 
 ## Inference Results (Test Set)
-- Test Accuracy: 77.16%
-- Test Precision: 0.7823
-- Test Recall: 0.7716
-- Test F1-Score: 0.7657
+- Test Accuracy (chunks): 77.16%
+- Test Precision (chunks): 0.7823
+- Test Recall (chunks): 0.7716
+- Test F1-Score (chunks): 0.7657
 - Confusion Matrix: [confusion_matrix_test.png](./confusion_matrix_test.png)
 - Batch Predictions: [prediction_batch_test.png](./prediction_batch_test.png)
 - Test Song-Level Accuracy: 83.00%
