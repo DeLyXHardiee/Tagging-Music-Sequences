@@ -12,7 +12,7 @@
 - Data Split: Stratified (Balanced Validation Set)
 
 ## Changes
-- Added more dropout layers to the ImprovedCNN model to reduce overfitting and removed layer 4 in the model.
+- Added more dropout layers to the ComplexCNN model to reduce overfitting and removed layer 4 in the model.
 
 ## Results
 - Final Train Loss: 0.7059

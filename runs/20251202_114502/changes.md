@@ -27,13 +27,6 @@
 - Validation F1-Score: 0.7947
 - Validation Song-Level Accuracy: 85.56%
 
---- Test Set ---
-- Test Accuracy (Chunk): 77.16%
-- Test Precision: 0.7823
-- Test Recall: 0.7716
-- Test F1-Score: 0.7657
-- Test Song-Level Accuracy: 83.00%
-
 ## Inference Results (Test Set)
 - Test Accuracy: 77.16%
 - Test Precision: 0.7823
